@@ -5,38 +5,113 @@
 
 //2
 
-document.addEventListener("keydown", function (event) {
-  // Check for Ctrl + Shift + n
-  if (event.ctrlKey && event.shiftKey && event.key === "n") {
-    DraggableDiv = createDraggableDiv();
-    document.appendChild(DraggableDiv);
+chrome.runtime.onMessage.addListener(function (message) {
+  if (message.action === "add-note") {
+    console.log("Keyboard shortcut detected in content script!");
+    Note = createOuterDiv();
+    dragElement(Note);
+    document.body.appendChild(Note);
   }
 });
 
-function createDraggableDiv() {
+function createOuterDiv() {
   // Create the outer container
-  var OuterDiv = document.createElement("div");
+  let OuterDiv = document.createElement("div");
   OuterDiv.id = "OuterDiv";
-  OuterDiv.style.width = "200px";
-  OuterDiv.style.height = "400px";
+  // OuterDiv.style.width = "300px";
+  // OuterDiv.style.height = "300px";
+  OuterDiv.style.position = "fixed";
+  OuterDiv.style.bottom = "50px";
+  OuterDiv.style.left = "50%";
+  OuterDiv.style.transform = "translateX(-50%)";
   OuterDiv.style.backgroundColor = "lightblue";
-  OuterDiv.style.position = "absolute";
+  // OuterDiv.style.position = "absolute";
+  OuterDiv.style.zIndex = 9;
   // document.body.appendChild(mydiv);
 
   // Create the header div with id="DivHeader" inside the mydiv container
-  var DivHeader = document.createElement("div");
+  let DivHeader = document.createElement("div");
   DivHeader.id = "DivHeader";
   DivHeader.innerHTML = "Click here to move";
   DivHeader.style.padding = "10px";
   DivHeader.style.cursor = "move";
   DivHeader.style.backgroundColor = "blue";
   DivHeader.style.color = "white";
+  DivHeader.style.zIndex = 10;
+
   OuterDiv.appendChild(DivHeader);
 
   // Create the content div with id="content" inside the mydiv container
-  var Content = document.createElement("div");
+  let Content = document.createElement("div");
   Content.id = "content";
+  //textarea
+  let TextArea = document.createElement("textarea");
+  TextArea.rows = 2;
+  TextArea.cols = 50;
+  TextArea.id = "textarea1";
+  //submit btn
+  let Submit = document.createElement("input");
+  Submit.type = "submit";
+  Submit.value = "save";
+  //br
+  let Br = document.createElement("br");
+
+  Content.appendChild(TextArea);
+  Content.appendChild(Br);
+  Content.appendChild(Submit);
   OuterDiv.appendChild(Content);
 
   return OuterDiv;
+}
+
+///  functions to make the element draggable   ///////////   ////////////////////////////////
+function dragElement(elmnt) {
+  var pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
+  if (document.getElementById("DivHeader")) {
+    // if present, the header is where you move the DIV from:
+    document.getElementById("DivHeader").onmousedown = dragMouseDown;
+  } else {
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+
+    // Check if the click happened on the textarea, and prevent dragging in that case
+    if (e.target === document.getElementById("textarea1")) {
+      return;
+    }
+
+    e.preventDefault();
+
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
 }
