@@ -23,9 +23,19 @@
     "<all_urls>",
     "storage",
     "webNavigation",
-    "history"
+    "history",
+    "commands"
   ],
   "background": {
     "service_worker": "background.js"
+  },
+  "commands": {
+    "add-note": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Z",
+        "mac": "Command+Shift+Z"
+      },
+      "description": "add a note on the current page."
+    }
   }
 }
