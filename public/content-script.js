@@ -7,24 +7,27 @@
 
 chrome.runtime.onMessage.addListener(function (message) {
   if (message.action === "add-note") {
-    console.log("Keyboard shortcut detected in content script!");
-    Note = createOuterDiv();
-    dragElement(Note);
-    document.body.appendChild(Note);
+    if (document.getElementById("OuterDiv-Note") === null) {
+      console.log("Keyboard shortcut detected in content script!");
+      Note = createOuterDiv();
+      dragElement(Note);
+      document.body.appendChild(Note);
+      document.getElementById("textarea-note").focus();
+    }
   }
 });
 
 function createOuterDiv() {
   // Create the outer container
   let OuterDiv = document.createElement("div");
-  OuterDiv.id = "OuterDiv";
-  // OuterDiv.style.width = "300px";
-  // OuterDiv.style.height = "300px";
+  OuterDiv.id = "OuterDiv-Note";
+  // OuterDiv.style.width = "500px";
+  OuterDiv.style.height = "80px";
   OuterDiv.style.position = "fixed";
   OuterDiv.style.bottom = "50px";
   OuterDiv.style.left = "50%";
   OuterDiv.style.transform = "translateX(-50%)";
-  OuterDiv.style.backgroundColor = "lightblue";
+  OuterDiv.style.backgroundColor = ""; //lightblue
   // OuterDiv.style.position = "absolute";
   OuterDiv.style.zIndex = 9;
   // document.body.appendChild(mydiv);
@@ -35,7 +38,7 @@ function createOuterDiv() {
   DivHeader.innerHTML = "Click here to move";
   DivHeader.style.padding = "10px";
   DivHeader.style.cursor = "move";
-  DivHeader.style.backgroundColor = "blue";
+  OuterDiv.style.backgroundColor = "lightblue";
   DivHeader.style.color = "white";
   DivHeader.style.zIndex = 10;
 
@@ -46,9 +49,9 @@ function createOuterDiv() {
   Content.id = "content";
   //textarea
   let TextArea = document.createElement("textarea");
-  TextArea.rows = 2;
-  TextArea.cols = 50;
-  TextArea.id = "textarea1";
+  TextArea.rows = 3;
+  TextArea.cols = 70;
+  TextArea.id = "textarea-note";
   //submit btn
   let Submit = document.createElement("input");
   Submit.type = "submit";
@@ -82,7 +85,7 @@ function dragElement(elmnt) {
     e = e || window.event;
 
     // Check if the click happened on the textarea, and prevent dragging in that case
-    if (e.target === document.getElementById("textarea1")) {
+    if (e.target === document.getElementById("textarea-note")) {
       return;
     }
 
