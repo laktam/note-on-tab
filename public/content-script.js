@@ -3,7 +3,7 @@
 //fill them with the content from storage
 //if there is no notes create an empty one
 
-//2
+//spawn left, right or center (default)
 
 chrome.runtime.onMessage.addListener(function (message) {
   if (message.action === "add-note") {
@@ -52,6 +52,9 @@ function createOuterDiv() {
   TextArea.rows = 3;
   TextArea.cols = 70;
   TextArea.id = "textarea-note";
+  TextArea.className = "note-textarea";
+  TextArea.placeholder = "Type your note here...";
+
   //submit btn
   let Submit = document.createElement("input");
   Submit.type = "submit";
@@ -63,6 +66,8 @@ function createOuterDiv() {
   Content.appendChild(Br);
   Content.appendChild(Submit);
   OuterDiv.appendChild(Content);
+
+  injectStyles();
 
   return OuterDiv;
 }
@@ -117,4 +122,25 @@ function dragElement(elmnt) {
     document.onmouseup = null;
     document.onmousemove = null;
   }
+}
+
+function injectStyles() {
+  const style = document.createElement("style");
+  style.textContent = `
+    /* Note-like styling for the textarea
+    width: 300px;
+      height: 200px;
+       */
+    .note-textarea {
+      
+      padding: 10px;
+      border: 2px solid #ffcc66;
+      background-color: #fff9e6;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      resize: none;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+  `;
+  document.head.appendChild(style);
 }
