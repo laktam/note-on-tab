@@ -5,6 +5,13 @@
 
 //spawn left, right or center (default)
 
+//get current page info
+let site = location.hostname,
+  title = document.title;
+let noteKey = title + " " + "[" + site + "]";
+noteKey = noteKey.replace(/ /g, "");
+console.log("note key in content script : ", noteKey);
+
 chrome.runtime.onMessage.addListener(function (message) {
   if (message.action === "add-note") {
     if (document.getElementById("OuterDiv-Note") === null) {
@@ -13,6 +20,8 @@ chrome.runtime.onMessage.addListener(function (message) {
       dragElement(Note);
       document.body.appendChild(Note);
       document.getElementById("textarea-note").focus();
+    } else {
+      document.getElementById("OuterDiv-Note").remove();
     }
   }
 });
@@ -24,12 +33,12 @@ function createOuterDiv() {
   // OuterDiv.style.width = "500px";
   OuterDiv.style.height = "80px";
   OuterDiv.style.position = "fixed";
-  OuterDiv.style.bottom = "50px";
+  OuterDiv.style.bottom = "90px";
   OuterDiv.style.left = "50%";
   OuterDiv.style.transform = "translateX(-50%)";
   OuterDiv.style.backgroundColor = ""; //lightblue
   // OuterDiv.style.position = "absolute";
-  OuterDiv.style.zIndex = 9;
+  OuterDiv.style.zIndex = 999;
   // document.body.appendChild(mydiv);
 
   // Create the header div with id="DivHeader" inside the mydiv container
@@ -39,8 +48,8 @@ function createOuterDiv() {
   DivHeader.style.padding = "10px";
   DivHeader.style.cursor = "move";
   OuterDiv.style.backgroundColor = "lightblue";
-  DivHeader.style.color = "white";
-  DivHeader.style.zIndex = 10;
+  // DivHeader.style.color = "white";
+  DivHeader.style.zIndex = 1000;
 
   OuterDiv.appendChild(DivHeader);
 
@@ -49,8 +58,8 @@ function createOuterDiv() {
   Content.id = "content";
   //textarea
   let TextArea = document.createElement("textarea");
-  TextArea.rows = 3;
-  TextArea.cols = 70;
+  TextArea.rows = 5;
+  TextArea.cols = 60;
   TextArea.id = "textarea-note";
   TextArea.className = "note-textarea";
   TextArea.placeholder = "Type your note here...";
@@ -59,6 +68,21 @@ function createOuterDiv() {
   let Submit = document.createElement("input");
   Submit.type = "submit";
   Submit.value = "save";
+  Submit.onclick = () => {
+    //get website title and make it the key
+    //store the note as the value
+    let site = location.hostname,
+      title = document.title;
+    let noteKey = title + " " + "[" + site + "]";
+    noteKey = noteKey.replace(/ /g, "");
+    let noteText = document.getElementById("textarea-note").value;
+
+    chrome.storage.local.set({ [noteKey]: noteText }).then(() => {
+      console.log("Note is set");
+      console.log(noteText);
+    });
+  };
+
   //br
   let Br = document.createElement("br");
 
@@ -128,8 +152,9 @@ function injectStyles() {
   const style = document.createElement("style");
   style.textContent = `
     /* Note-like styling for the textarea
-    width: 300px;
+      width: 300px;
       height: 200px;
+      resize: none;
        */
     .note-textarea {
       
@@ -138,7 +163,7 @@ function injectStyles() {
       background-color: #fff9e6;
       font-family: Arial, sans-serif;
       font-size: 14px;
-      resize: none;
+      
       box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     }
   `;
