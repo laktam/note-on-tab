@@ -7,7 +7,7 @@ import "./App.css";
 // };
 
 function App() {
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState([]);
   const [noteKey, setNoteKey] = useState("");
 
   useEffect(() => {
@@ -19,9 +19,8 @@ function App() {
       }
     });
   }, []);
-  useEffect(() => {
-    console.log("note key in 2nd useeffect ", noteKey);
 
+  useEffect(() => {
     chrome.storage.local.get([noteKey]).then((result) => {
       setNotes(result[noteKey]);
     });

@@ -33,7 +33,7 @@ function createOuterDiv() {
   // OuterDiv.style.width = "500px";
   OuterDiv.style.height = "80px";
   OuterDiv.style.position = "fixed";
-  OuterDiv.style.bottom = "90px";
+  OuterDiv.style.bottom = "110px";
   OuterDiv.style.left = "50%";
   OuterDiv.style.transform = "translateX(-50%)";
   OuterDiv.style.backgroundColor = ""; //lightblue
@@ -77,10 +77,30 @@ function createOuterDiv() {
     noteKey = noteKey.replace(/ /g, "");
     let noteText = document.getElementById("textarea-note").value;
 
-    chrome.storage.local.set({ [noteKey]: noteText }).then(() => {
-      console.log("Note is set");
-      console.log(noteText);
-    });
+    //get notes then append current note to the list
+    let noteList = [];
+    chrome.storage.local
+      .get([noteKey])
+      .then((result) => {
+        noteList = result[noteKey];
+        console.log("result", result);
+        //if it doesn't exist init it
+        console.log("note list before ", noteList);
+
+        if (noteList === undefined) {
+          //init localstorage
+          chrome.storage.local.set({ [noteKey]: [] }).then(() => {
+            console.log("init notelist on storage");
+          });
+        }
+      })
+      .then(() => {
+        noteList.push(noteText);
+        chrome.storage.local.set({ [noteKey]: noteList }).then(() => {
+          console.log("Note is set");
+          console.log("note list after ", noteList);
+        });
+      });
   };
 
   //br
