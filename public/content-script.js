@@ -101,6 +101,7 @@ function createOuterDiv() {
           console.log("note list after ", noteList);
         });
       });
+    document.getElementById("textarea-note").value = "";
   };
 
   //br
