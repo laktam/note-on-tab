@@ -79,28 +79,33 @@ function createOuterDiv() {
 
     //get notes then append current note to the list
     let noteList = [];
-    chrome.storage.local
-      .get([noteKey])
-      .then((result) => {
-        noteList = result[noteKey];
-        console.log("result", result);
-        //if it doesn't exist init it
-        console.log("note list before ", noteList);
+    chrome.storage.local.get([noteKey]).then((result) => {
+      noteList = result[noteKey];
+      console.log("result", result);
+      //if it doesn't exist init it
+      console.log("note list before ", noteList);
 
-        if (noteList === undefined) {
-          //init localstorage
-          chrome.storage.local.set({ [noteKey]: [] }).then(() => {
-            console.log("init notelist on storage");
+      if (noteList === undefined) {
+        //init localstorage
+        chrome.storage.local.set({ [noteKey]: [] }).then(() => {
+          console.log("init notelist on storage");
+          noteList = [];
+          noteList.push(noteText);
+          chrome.storage.local.set({ [noteKey]: noteList }).then(() => {
+            console.log("Note is set");
+            console.log("note list after ", noteList);
           });
-        }
-      })
-      .then(() => {
+        });
+      } else {
+        //if it exist just update it
         noteList.push(noteText);
         chrome.storage.local.set({ [noteKey]: noteList }).then(() => {
           console.log("Note is set");
           console.log("note list after ", noteList);
         });
-      });
+      }
+    });
+
     document.getElementById("textarea-note").value = "";
   };
 
