@@ -16,7 +16,7 @@ function App() {
     chrome.runtime.sendMessage({ action: "getNoteKey" }, (response) => {
       // Handle the response from the background script
       if (response && response.noteKey) {
-        console.log(response.noteKey);//full
+        console.log(response.noteKey);
 
         setNoteKey(response.noteKey);
       }
@@ -31,22 +31,25 @@ function App() {
 
       setNotes(result[noteKey]);
     });
-  },[noteKey]);
+  }, [noteKey]);
 
   return (
     <div className="App">
-      {notes}
       <List sx={{ bgcolor: "background.paper" }}>
-        {notes.map((note, index) => {
-          return (
-            <>
-              <ListItem key={index}>
-                <ListItemText primary={note} />
-              </ListItem>
-              <Divider />
-            </>
-          );
-        })}
+        {notes !== undefined ? (
+          notes.map((note, index) => {
+            return (
+              <>
+                <ListItem key={index}>
+                  <ListItemText primary={note} />
+                </ListItem>
+                <Divider />
+              </>
+            );
+          })
+        ) : (
+          <p>No notes on this page</p>
+        )}
       </List>
     </div>
   );
